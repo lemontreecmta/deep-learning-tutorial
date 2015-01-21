@@ -14,13 +14,11 @@
 %  allow your sparse autoencoder to get good filters; you do not need to 
 %  change the parameters below.
 
-visibleSize = 8*8;   % number of input units 
-hiddenSize = 25;     % number of hidden units 
-sparsityParam = 0.01;   % desired average activation of the hidden units.
-                     % (This was denoted by the Greek alphabet rho, which looks like a lower-case "p",
-		     %  in the lecture notes). 
-lambda = 0.0001;     % weight decay parameter       
-beta = 3;            % weight of sparsity penalty term       
+visibleSize = 28*28;
+hiddenSize = 196;
+sparsityParam = 0.1;
+lambda = 3e-3;
+beta = 3;
 
 %%======================================================================
 %% STEP 1: Implement sampleIMAGES
@@ -28,9 +26,19 @@ beta = 3;            % weight of sparsity penalty term
 %  After implementing sampleIMAGES, the display_network command should
 %  display a random sample of 200 patches from the dataset
 
-patches = sampleIMAGES;
-%display_network(patches(:,randi(size(patches,2),200,1)),8);
+% Change the filenames if you've saved the files under different names
+% On some platforms, the files might be saved as 
+% train-images.idx3-ubyte / train-labels.idx1-ubyte
 
+images = loadMNISTImages('train-images.idx3-ubyte');
+labels = loadMNISTLabels('train-labels.idx1-ubyte');
+
+%patches = first 10000 images from the MNIST dataset
+patches = (images(:, 1: 10000))
+
+% We are using display_network from the autoencoder code
+display_network(images(:,1:100)); % Show the first 100 images
+disp(labels(1:10));
 
 %  Obtain random parameters theta
 theta = initializeParameters(hiddenSize, visibleSize);
