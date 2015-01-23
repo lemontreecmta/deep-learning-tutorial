@@ -1,0 +1,1 @@
+Use PCA to reduce dimensions (keeping dimensions with low eigenvalues of covariance matrix = 0) and and whitening to make dimensions more independent while having same unit variance.  
