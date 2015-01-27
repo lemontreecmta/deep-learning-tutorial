@@ -1,0 +1,1 @@
+Ongoing: implementation of softmax regression for a dataset of n classes with a weight decay parameter. 
