@@ -16,7 +16,18 @@ pred = zeros(1, size(data, 2));
 %                from 1.
 
 
+%predict file
+%need to include the new p_denominator computation
 
+m = theta' * data ;
+m = bsxfun(@minus, m, max(m, [], 1));
+m = bsxfun(@rdivide, m, sum(m));
+p_numerator = exp(1) .^ m;
+p_denominator = 1./ sum(p_numerator, 1); 
+p_denominator = repmat(p_denominator, 1, numClassses); 
+p_matrix = p_numerator ./ p_denominator;
+(M, I) = max(p_matrix, [], 1);
+pred = I;
 
 
 

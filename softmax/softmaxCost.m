@@ -26,24 +26,44 @@ thetagrad = zeros(numClasses, inputSize);
 
 %compute cost
 
-m = theta' * data ;
-m = bsxfun(@minus, m, max(m, [], 1));
-m = bsxfun(@rdivide, m, sum(m));
-p_numerator = exp(1) .^ m;
-p_denominator = 1./ sum(p_numerator, 1); % vector of length inputSize, which adds sum of all numerator for one training example
-p_denominator = repmat(p_denominator, 1, numClassses); %expand it using repmat
+x = data;
+t = theta * x;
+%t = bsxfun(@minus, t, max(t, [], 1));
+%t = bsxfun(@rdivide, t, sum(t));
+p_numerator = exp(1) .^ t;
+denominator = sum(p_numerator, 1); % vector of length numCases, which adds sum of all numerator for one training example
+p_denominator = repmat(denominator, 1, numClasses); %expand it using repmat
+%repmat and reshape should be used carefully. p_denominator is the replication
+%of sum over all values in one instance) 
+p_denominator = reshape(p_denominator, numCases, numClasses );
+p_denominator = p_denominator'; 
 p_matrix = p_numerator ./ p_denominator;
 log_matrix = log(p_matrix);
 
 %assume the true value matrix is already computed in groundTruth
-cost = -1/ inputSize * sum(sum(groundTruth * log_matrix, 1)) + lambda/2 * (sum(sum (theta .* theta) ) );
+
+cost = ( -1/ numCases ) * sum(sum(groundTruth .* log_matrix)) + (lambda/2) * (sum(sum (theta .* theta) ) );
 
 %compute thetagrad
 %for the ith example: x(:, i) * (groundTruth(:, i) - p_matrix(:, i)
+grad = zeros(size(thetagrad));
 
-thetagrad = -1/ inputSize * sum (x * (groundTruth - p_matrix), 1) + lambda * theta;
+%to use vectorization and completely eliminate for loop seems to involve use of 3D
+%matrix, which I do not implement 
 
+for j = 1:numClasses
 
+    Z = zeros(size(x));
+    S = zeros(numCases);
+    S = groundTruth(j,:) - p_matrix(j,:);
+    S = repmat(S, 1, inputSize);
+    S = reshape(S, numCases, inputSize);
+    Z = x .* S';
+  
+    Z_sum = sum (Z, 2)';    
+    thetagrad(j, :) = ((- 1/ numCases) * Z_sum) + lambda * theta(j,:);
+end
+   
 % ------------------------------------------------------------------
 % Unroll the gradient matrices into a vector for minFunc
 grad = [thetagrad(:)];
